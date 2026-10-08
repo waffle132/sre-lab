@@ -1,0 +1,9 @@
+# 镜像 tar 包（从 Windows 导入的，不需要进 git）
+image/
+*.tar
+
+# 本地构建产物
+u-short
+
+# 运行数据目录
+prometheus_data/

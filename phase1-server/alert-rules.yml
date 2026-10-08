@@ -1,0 +1,11 @@
+groups:
+  - name: u-short-alerts
+    rules:
+      - alert: usdown
+        expr: up{job="u-short"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "u-short service is down"
+          description: "The u-short service has been down for more than 1 minute."
