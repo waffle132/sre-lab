@@ -1,0 +1,2 @@
+* * * * * /usr/bin/python3 /home/sre/sre-lab/phase1-server/probe.py --url http://localhost:8080/healthz --timeout 2 >> /home/sre/sre-lab/phase1-server/logs/health-probe.log 2>&1
+0 0 * * * /usr/sbin/logrotate -s /home/sre/sre-lab/phase1-server/runtime/logrotate.state /home/sre/sre-lab/phase1-server/logrotate/health-probe.conf >> /home/sre/sre-lab/phase1-server/logs/logrotate.log 2>&1

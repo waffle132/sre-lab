@@ -7,3 +7,10 @@ u-short
 
 # 运行数据目录
 prometheus_data/
+
+# Local runtime files and backups
+__pycache__/
+*.py[cod]
+logs/
+runtime/
+backups/
