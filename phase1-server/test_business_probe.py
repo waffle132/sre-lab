@@ -47,8 +47,31 @@ def test_correct_location():
         )
         connection.close.assert_called_once()
 # 正常场景不捕获 SystemExit；若意外退出，测试直接失败
+
+def test_wrong_status():
+    with patch("business_probe.http.client.HTTPConnection") as factory:
+        connection = factory.return_value
+        response = connection.getresponse.return_value
+        response.status = 200
+        response.getheader.return_value = "http://example.com"
+        try:
+            business_probe.check_redirect(
+                "test-code",
+                "http://example.com",
+                "http://localhost:8080",
+                2
+            )
+        except SystemExit as e:
+            assert e.code == 1
+        else:
+            raise AssertionError("返回错误状态码后，脚本没有退出")
+        connection.close.assert_called_once()
+
+
 test_redirect_failure(ConnectionRefusedError("模拟连接被拒绝"))
 test_redirect_failure(TimeoutError("模拟连接超时"))
 test_wrong_location()
 test_correct_location()
+test_wrong_status()
+
 print("All redirect tests passed")
