@@ -1,0 +1,23 @@
+# yaml-language-server: disable
+services:
+  counter:
+    image: counter:lab-v2
+    build: .
+    ports:
+      - 18081:9000
+    environment:
+       APP_PORT: "9000"
+       DATA_DIR: "/data"
+    volumes:
+      - counter_data:/data
+    mem_limit: 128m
+    cpus: "0.5"
+    networks:
+      - shared_net
+
+networks:
+  shared_net:
+    external: true
+    name: training_shared
+volumes:
+  counter_data:

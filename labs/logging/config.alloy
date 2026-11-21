@@ -1,0 +1,29 @@
+discovery.docker "counter" {
+  host = "unix:///var/run/docker.sock"
+
+  filter {
+    name = "label"
+    values = [
+      "com.docker.compose.project=docker-transfer",
+      "com.docker.compose.service=counter",
+    ]
+  }
+}
+
+loki.source.docker "counter" {
+  host    = "unix:///var/run/docker.sock"
+  targets = discovery.docker.counter.targets
+
+  labels = {
+    service_name = "counter",
+    environment  = "lab",
+  }
+
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

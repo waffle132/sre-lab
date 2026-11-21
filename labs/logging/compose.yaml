@@ -1,0 +1,30 @@
+services:
+  loki:
+    image: grafana/loki:3.6.0
+    ports:
+      - 127.0.0.1:3100:3100
+    volumes:
+      - ./loki.yaml:/etc/loki/loki.yaml:ro
+      - loki_data:/loki
+    networks:
+      - shared_net
+    command: ["-config.file=/etc/loki/loki.yaml"]
+
+  alloy:
+    image: grafana/alloy:v1.22.0
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - alloy_data:/var/lib/alloy/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: 
+      - shared_net
+    command: ["run", "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy"]
+  
+
+volumes:
+  loki_data:
+  alloy_data:
+networks:
+  shared_net:
+    name: training_shared
+    external: true
