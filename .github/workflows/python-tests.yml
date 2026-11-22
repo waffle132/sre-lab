@@ -1,0 +1,25 @@
+name: Pytnon tsets
+on : push
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: get repository code
+        uses: actions/checkout@v4
+
+      - name: set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: test health probe
+        working-directory: phase1-server
+        run: python test_probe.py
+
+      - name: test bussiness probe
+        working-directory: phase1-server
+        run: python test_business_probe.py
