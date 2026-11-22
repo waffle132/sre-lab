@@ -23,3 +23,13 @@ jobs:
       - name: test bussiness probe
         working-directory: phase1-server
         run: python test_business_probe.py
+  build:
+    needs: tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: get repository code
+        uses: actions/checkout@v4
+
+      - name: build u-short image
+        run: docker build -t u-short:ci ./phase1-server
