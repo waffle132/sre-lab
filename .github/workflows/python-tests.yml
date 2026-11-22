@@ -27,9 +27,22 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - name: get repository code
+      - name: Get repository code
         uses: actions/checkout@v4
 
-      - name: build u-short image
-        run: docker build -t u-short:ci ./phase1-server
+      - name: Log in to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build image
+        run: docker build -t ghcr.io/waffle132/u-short:${{ github.sha }} ./phase1-server
+
+      - name: Push image
+        run: docker push ghcr.io/waffle132/u-short:${{ github.sha }}
