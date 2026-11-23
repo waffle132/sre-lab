@@ -1,0 +1,22 @@
+name: Check WSL runner
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: [self-hosted, linux, x64, sre-deploy]
+    timeout-minutes: 2
+
+    steps:
+      - name: Identify runner
+        run: |
+          whoami
+          hostname
+          pwd
+
+      - name: Check Docker access
+        run: docker info --format '{{.ServerVersion}}'
