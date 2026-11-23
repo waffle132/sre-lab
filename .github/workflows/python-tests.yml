@@ -1,5 +1,7 @@
-name: Pytnon tsets
-on : push
+name: Test, build and deploy u-short
+on:
+  push:
+    branches: [main]
 permissions:
   contents: read
 
@@ -46,3 +48,27 @@ jobs:
 
       - name: Push image
         run: docker push ghcr.io/waffle132/u-short:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: [self-hosted, linux, x64, sre-deploy]
+    timeout-minutes: 10
+    concurrency:
+      group: u-short-wsl-deployment
+      cancel-in-progress: false
+    env:
+      DEPLOY_IMAGE: ghcr.io/waffle132/u-short:${{ github.sha }}
+
+    steps:
+      - name: Pull this commit's image
+        run: docker pull "$DEPLOY_IMAGE"
+
+      - name: Deploy and verify
+        working-directory: /home/sre/sre-lab/phase1-server
+        run: bash deploy.sh "$DEPLOY_IMAGE"
+
+      - name: Confirm deployed version
+        run: |
+          actual=$(docker inspect u-short --format '{{.Config.Image}}')
+          echo "Running image: $actual"
+          test "$actual" = "$DEPLOY_IMAGE"
