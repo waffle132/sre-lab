@@ -1,0 +1,44 @@
+name: Deploy u-short to WSL
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Full GHCR image address with a 40-character commit tag
+        required: true
+        type: string
+        default: ghcr.io/waffle132/u-short:eeb9e01727c5edcf7032966c51a30cf88c437aff
+
+permissions:
+  contents: read
+
+concurrency:
+  group: u-short-wsl-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, linux, x64, sre-deploy]
+    timeout-minutes: 10
+    env:
+      DEPLOY_IMAGE: ${{ inputs.image }}
+
+    steps:
+      - name: Validate image selection
+        shell: bash
+        run: |
+          if [[ ! "$DEPLOY_IMAGE" =~ ^ghcr\.io/waffle132/u-short:[0-9a-f]{40}$ ]]; then
+            echo 'Use a u-short GHCR image tagged with a full commit SHA.'
+            exit 2
+          fi
+
+      - name: Pull selected image
+        run: docker pull "$DEPLOY_IMAGE"
+
+      - name: Deploy and verify
+        working-directory: /home/sre/sre-lab/phase1-server
+        run: bash deploy.sh "$DEPLOY_IMAGE"
+
+      - name: Confirm running image
+        run: docker inspect u-short --format '{{.Config.Image}}'
